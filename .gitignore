@@ -1,0 +1,18 @@
+# Ignore compiled bytecode
+*.pyc
+__pycache__/
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore virtual environment
+env/
+
+medical_data_v2.csv
+hypertension_prediction.py
+instructions.md
