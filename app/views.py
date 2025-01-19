@@ -82,10 +82,6 @@ def generate_visualizations(prediction_data, input_data):
     """Generate visualizations for the prediction results"""
     visualizations = {}
     
-    # Create a directory for visualizations if it doesn't exist
-    viz_dir = os.path.join(settings.MEDIA_ROOT, 'visualizations')
-    os.makedirs(viz_dir, exist_ok=True)
-    
     # 1. Risk Factors Radar Chart
     categories = ['Age', 'Blood Pressure', 'Heart Rate', 'Cholesterol', 'Risk Factors']
     # Normalize values for radar chart
