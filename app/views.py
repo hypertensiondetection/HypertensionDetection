@@ -10,6 +10,7 @@ import seaborn as sns
 import base64
 from io import BytesIO
 import numpy as np
+from django.http import JsonResponse
 
 # Suppress scikit-learn version warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -28,32 +29,46 @@ def preprocess_input(data):
     """
     Convert form data to model input format
     """
-    # Mapping dictionaries
+    # Mapping dictionaries from hypertension_prediction.py
     mappings = {
         'Gender': {'Male': 1, 'Female': 0},
-        'Smoker': {'Yes': 1, 'No': 0},
-        'Blood_Pressure': {'High': 2, 'Normal': 1, 'Low': 0},
-        'Alcohol_Consumption': {'Yes': 1, 'No': 0},
-        'Heart_Rate': {'High': 2, 'Normal': 1, 'Low': 0},
-        'Cholesterol': {'High': 2, 'Normal': 1, 'Low': 0},
-        'Diabetes': {'Yes': 1, 'No': 0}
+        'Genetic_History': {'Yes': 1, 'No': 0},
+        'Smoking_Habits': {'Often': 3, 'Sometimes': 2, 'Rarely': 1, 'Never': 0},
+        'Alcohol_Consumption': {'Often': 3, 'Sometimes': 2, 'Rarely': 1, 'Never': 0},
+        'Physical_Activity': {'Often': 3, 'Sometimes': 2, 'Rarely': 1, 'Never': 0},
     }
+    
+    # Parse blood pressure
+    try:
+        systolic_bp, diastolic_bp = map(float, data['bp'].split('/'))
+        # Validate BP ranges
+        if not (90 <= systolic_bp <= 200 and 60 <= diastolic_bp <= 120):
+            raise ValueError("Blood pressure values out of valid range")
+    except (ValueError, AttributeError) as e:
+        # Default values if parsing fails
+        systolic_bp, diastolic_bp = 120.0, 80.0
     
     # Convert input data
     processed_data = {
         'Gender': mappings['Gender'][data['gender']],
         'Age': int(data['age']),
-        'Smoker': mappings['Smoker'][data['smoker']],
-        'Blood_Pressure': mappings['Blood_Pressure'][data['blood_pressure']],
+        'Genetic_History': mappings['Genetic_History'][data['genetic_history']],
+        'Smoking_Habits': mappings['Smoking_Habits'][data['smoking_habits']],
         'Alcohol_Consumption': mappings['Alcohol_Consumption'][data['alcohol_consumption']],
-        'Heart_Rate': mappings['Heart_Rate'][data['heart_rate']],
-        'Cholesterol': mappings['Cholesterol'][data['cholesterol']],
-        'Diabetes': mappings['Diabetes'][data['diabetes']]
+        'Physical_Activity': mappings['Physical_Activity'][data['physical_activity']],
+        'Cholesterol': float(data['cholesterol']),
+        'Heart_Rate': float(data['heart_rate']),
+        'Diabetes': float(data['diabetes']),
+        'Systolic_BP': systolic_bp,
+        'Diastolic_BP': diastolic_bp
     }
     
-    # Create feature list in correct order
-    features = ['Gender', 'Age', 'Smoker', 'Blood_Pressure', 'Alcohol_Consumption', 
-               'Heart_Rate', 'Cholesterol', 'Diabetes']
+    # Create feature list in correct order from hypertension_prediction.py
+    features = [
+        'Gender', 'Age', 'Genetic_History', 'Smoking_Habits',
+        'Alcohol_Consumption', 'Physical_Activity', 'Cholesterol',
+        'Heart_Rate', 'Diabetes', 'Systolic_BP', 'Diastolic_BP'
+    ]
     
     # Convert to list in correct order
     input_data = [[processed_data[feature] for feature in features]]
@@ -86,16 +101,23 @@ def generate_visualizations(prediction_data, input_data):
     categories = ['Age', 'Blood Pressure', 'Heart Rate', 'Cholesterol', 'Risk Factors']
     # Normalize values for radar chart
     age_normalized = min(float(input_data['age']) / 100, 1)
-    bp_value = {'High': 1, 'Normal': 0.5, 'Low': 0}[input_data['blood_pressure']]
-    hr_value = {'High': 1, 'Normal': 0.5, 'Low': 0}[input_data['heart_rate']]
-    chol_value = {'High': 1, 'Normal': 0.5, 'Low': 0}[input_data['cholesterol']]
     
-    # Calculate risk factor score (0-1) based on smoking, diabetes, and alcohol
+    # Get BP values from the combined BP field
+    try:
+        systolic_bp, diastolic_bp = map(float, input_data['bp'].split('/'))
+    except (ValueError, AttributeError):
+        systolic_bp, diastolic_bp = 120.0, 80.0
+        
+    bp_value = min((systolic_bp - 90) / 110, 1)  # Normalize BP between 90-200
+    hr_value = min((float(input_data['heart_rate']) - 40) / 100, 1)  # Normalize HR between 40-140
+    chol_value = min((float(input_data['cholesterol']) - 2.0) / 6.0, 1)  # Normalize Cholesterol between 2.0-8.0
+    
+    # Calculate risk factor score (0-1) based on smoking, genetic history, and alcohol
     risk_factors = (
-        (1 if input_data['smoker'] == 'Yes' else 0) +
-        (1 if input_data['diabetes'] == 'Yes' else 0) +
-        (1 if input_data['alcohol_consumption'] == 'Yes' else 0)
-    ) / 3
+        (float(input_data['smoking_habits'] == 'Often') * 0.4) +
+        (float(input_data['genetic_history'] == 'Yes') * 0.3) +
+        (float(input_data['alcohol_consumption'] == 'Often') * 0.3)
+    )
     
     values = [age_normalized, bp_value, hr_value, chol_value, risk_factors]
     
@@ -147,8 +169,8 @@ def generate_visualizations(prediction_data, input_data):
     plt.figure(figsize=(10, 6))
     lifestyle_factors = ['Smoking', 'Alcohol', 'Diabetes']
     lifestyle_values = [
-        1 if input_data['smoker'] == 'Yes' else 0,
-        1 if input_data['alcohol_consumption'] == 'Yes' else 0,
+        1 if input_data['smoking_habits'] == 'Often' else 0,
+        1 if input_data['alcohol_consumption'] == 'Often' else 0,
         1 if input_data['diabetes'] == 'Yes' else 0
     ]
     colors = ['#e74c3c' if val == 1 else '#2ecc71' for val in lifestyle_values]
@@ -217,8 +239,19 @@ def index(request):
             # Generate visualizations
             visualizations = generate_visualizations(prediction, form_data)
             
+            # If it's an AJAX request, only return the result section
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return render(request, 'index.html', {
+                    'prediction': prediction,
+                    'visualizations': visualizations,
+                    'form_data': form_data,
+                    'ajax_request': True
+                })
+            
         except Exception as e:
             prediction = {'error': str(e)}
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'error': str(e)}, status=400)
     
     return render(request, 'index.html', {
         'prediction': prediction,

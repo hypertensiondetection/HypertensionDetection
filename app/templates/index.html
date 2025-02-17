@@ -205,6 +205,88 @@
             background-color: rgba(0, 0, 0, 0.2);
             top: 0;
         }
+        
+        /* Loading Animation Styles */
+        .loading-animation {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+
+        .loading-animation div {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            animation: loading-animation 1.2s linear infinite;
+        }
+
+        .loading-animation div:nth-child(1) {
+            top: 8px;
+            left: 8px;
+            animation-delay: 0s;
+        }
+
+        .loading-animation div:nth-child(2) {
+            top: 8px;
+            left: 32px;
+            animation-delay: -0.4s;
+        }
+
+        .loading-animation div:nth-child(3) {
+            top: 8px;
+            left: 56px;
+            animation-delay: -0.8s;
+        }
+
+        .loading-animation div:nth-child(4) {
+            top: 32px;
+            left: 8px;
+            animation-delay: -0.4s;
+        }
+
+        .loading-animation div:nth-child(5) {
+            top: 32px;
+            left: 32px;
+            animation-delay: -0.8s;
+        }
+
+        .loading-animation div:nth-child(6) {
+            top: 32px;
+            left: 56px;
+            animation-delay: -1.2s;
+        }
+
+        .loading-animation div:nth-child(7) {
+            top: 56px;
+            left: 8px;
+            animation-delay: -0.8s;
+        }
+
+        .loading-animation div:nth-child(8) {
+            top: 56px;
+            left: 32px;
+            animation-delay: -1.2s;
+        }
+
+        .loading-animation div:nth-child(9) {
+            top: 56px;
+            left: 56px;
+            animation-delay: -1.6s;
+        }
+
+        @keyframes loading-animation {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.7);
+            }
+        }
     </style>
 </head>
 <body>
@@ -237,49 +319,30 @@
                                 <div class="col-md-6">
                                     <label class="form-label"><i class="fas fa-birthday-cake me-2"></i>Age</label>
                                     <input type="number" name="age" class="form-control" min="18" max="100" required 
+                                           placeholder="Enter age (18-100)"
+                                           title="Please enter your age between 18 and 100 years"
                                            value="{{ form_data.age|default:'' }}">
                                 </div>
-                                
-                                <!-- Blood Pressure -->
+
+                                <!-- Genetic History -->
                                 <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-heart-pulse me-2"></i>Blood Pressure</label>
-                                    <select name="blood_pressure" class="form-select" required>
+                                    <label class="form-label"><i class="fas fa-dna me-2"></i>Genetic History</label>
+                                    <select name="genetic_history" class="form-select" required>
                                         <option value="">Choose...</option>
-                                        <option value="High" {% if form_data.blood_pressure == "High" %}selected{% endif %}>High</option>
-                                        <option value="Normal" {% if form_data.blood_pressure == "Normal" %}selected{% endif %}>Normal</option>
-                                        <option value="Low" {% if form_data.blood_pressure == "Low" %}selected{% endif %}>Low</option>
+                                        <option value="Yes" {% if form_data.genetic_history == "Yes" %}selected{% endif %}>Yes</option>
+                                        <option value="No" {% if form_data.genetic_history == "No" %}selected{% endif %}>No</option>
                                     </select>
                                 </div>
-                                
-                                <!-- Heart Rate -->
+
+                                <!-- Smoking Habits -->
                                 <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-wave-square me-2"></i>Heart Rate</label>
-                                    <select name="heart_rate" class="form-select" required>
+                                    <label class="form-label"><i class="fas fa-smoking me-2"></i>Smoking Habits</label>
+                                    <select name="smoking_habits" class="form-select" required>
                                         <option value="">Choose...</option>
-                                        <option value="High" {% if form_data.heart_rate == "High" %}selected{% endif %}>High</option>
-                                        <option value="Normal" {% if form_data.heart_rate == "Normal" %}selected{% endif %}>Normal</option>
-                                        <option value="Low" {% if form_data.heart_rate == "Low" %}selected{% endif %}>Low</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Cholesterol -->
-                                <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-droplet me-2"></i>Cholesterol</label>
-                                    <select name="cholesterol" class="form-select" required>
-                                        <option value="">Choose...</option>
-                                        <option value="High" {% if form_data.cholesterol == "High" %}selected{% endif %}>High</option>
-                                        <option value="Normal" {% if form_data.cholesterol == "Normal" %}selected{% endif %}>Normal</option>
-                                        <option value="Low" {% if form_data.cholesterol == "Low" %}selected{% endif %}>Low</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Smoker -->
-                                <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-smoking me-2"></i>Smoker</label>
-                                    <select name="smoker" class="form-select" required>
-                                        <option value="">Choose...</option>
-                                        <option value="Yes" {% if form_data.smoker == "Yes" %}selected{% endif %}>Yes</option>
-                                        <option value="No" {% if form_data.smoker == "No" %}selected{% endif %}>No</option>
+                                        <option value="Often" {% if form_data.smoking_habits == "Often" %}selected{% endif %}>Often</option>
+                                        <option value="Sometimes" {% if form_data.smoking_habits == "Sometimes" %}selected{% endif %}>Sometimes</option>
+                                        <option value="Rarely" {% if form_data.smoking_habits == "Rarely" %}selected{% endif %}>Rarely</option>
+                                        <option value="Never" {% if form_data.smoking_habits == "Never" %}selected{% endif %}>Never</option>
                                     </select>
                                 </div>
                                 
@@ -288,85 +351,192 @@
                                     <label class="form-label"><i class="fas fa-wine-glass-alt me-2"></i>Alcohol Consumption</label>
                                     <select name="alcohol_consumption" class="form-select" required>
                                         <option value="">Choose...</option>
-                                        <option value="Yes" {% if form_data.alcohol_consumption == "Yes" %}selected{% endif %}>Yes</option>
-                                        <option value="No" {% if form_data.alcohol_consumption == "No" %}selected{% endif %}>No</option>
+                                        <option value="Often" {% if form_data.alcohol_consumption == "Often" %}selected{% endif %}>Often</option>
+                                        <option value="Sometimes" {% if form_data.alcohol_consumption == "Sometimes" %}selected{% endif %}>Sometimes</option>
+                                        <option value="Rarely" {% if form_data.alcohol_consumption == "Rarely" %}selected{% endif %}>Rarely</option>
+                                        <option value="Never" {% if form_data.alcohol_consumption == "Never" %}selected{% endif %}>Never</option>
                                     </select>
                                 </div>
-                                
+
+                                <!-- Physical Activity -->
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-running me-2"></i>Physical Activity</label>
+                                    <select name="physical_activity" class="form-select" required>
+                                        <option value="">Choose...</option>
+                                        <option value="Often" {% if form_data.physical_activity == "Often" %}selected{% endif %}>Often</option>
+                                        <option value="Sometimes" {% if form_data.physical_activity == "Sometimes" %}selected{% endif %}>Sometimes</option>
+                                        <option value="Rarely" {% if form_data.physical_activity == "Rarely" %}selected{% endif %}>Rarely</option>
+                                        <option value="Never" {% if form_data.physical_activity == "Never" %}selected{% endif %}>Never</option>
+                                    </select>
+                                </div>
+
+                                <!-- Cholesterol -->
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-droplet me-2"></i>Cholesterol (mmol/L)</label>
+                                    <input type="number" name="cholesterol" class="form-control" min="2.0" max="8.0" step="0.1" required 
+                                           placeholder="Enter cholesterol (2.0-8.0)"
+                                           title="Please enter your cholesterol level between 2.0 and 8.0 mmol/L"
+                                           value="{{ form_data.cholesterol|default:'' }}">
+                                </div>
+
+                                <!-- Heart Rate -->
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-heartbeat me-2"></i>Heart Rate (bpm)</label>
+                                    <input type="number" name="heart_rate" class="form-control" min="40" max="140" required 
+                                           placeholder="Enter heart rate (40-140)"
+                                           title="Please enter your heart rate between 40 and 140 beats per minute"
+                                           value="{{ form_data.heart_rate|default:'' }}">
+                                </div>
+
                                 <!-- Diabetes -->
                                 <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-syringe me-2"></i>Diabetes</label>
-                                    <select name="diabetes" class="form-select" required>
-                                        <option value="">Choose...</option>
-                                        <option value="Yes" {% if form_data.diabetes == "Yes" %}selected{% endif %}>Yes</option>
-                                        <option value="No" {% if form_data.diabetes == "No" %}selected{% endif %}>No</option>
-                                    </select>
+                                    <label class="form-label"><i class="fas fa-syringe me-2"></i>Diabetes (mmol/L)</label>
+                                    <input type="number" name="diabetes" class="form-control" min="3.0" max="15.0" step="0.1" required 
+                                           placeholder="Enter glucose level (3.0-15.0)"
+                                           title="Please enter your blood glucose level between 3.0 and 15.0 mmol/L"
+                                           value="{{ form_data.diabetes|default:'' }}">
+                                </div>
+
+                                <!-- Blood Pressure -->
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-heart me-2"></i>Blood Pressure (mmHg)</label>
+                                    <input type="text" name="bp" class="form-control" pattern="\d{2,3}\/\d{2,3}" 
+                                           placeholder="120/80" required 
+                                           value="{{ form_data.bp|default:'' }}"
+                                           title="Please enter blood pressure in format: 120/80">
                                 </div>
                             </div>
                             
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary px-5">
                                     <i class="fas fa-calculator me-2"></i>
-                                    Analyze Risk
+                                    Analyze Data
                                 </button>
                             </div>
                         </form>
 
                         {% if prediction %}
-                        <div class="result-box">
-                            <div class="risk-level {% if prediction.ensemble.prediction == 'Yes' %}risk-high{% else %}risk-low{% endif %} mb-4">
-                                <i class="fas {% if prediction.ensemble.prediction == 'Yes' %}fa-exclamation-triangle{% else %}fa-check-circle{% endif %} me-2"></i>
-                                {% if prediction.ensemble.prediction == 'Yes' %}High Risk{% else %}Low Risk{% endif %} of Hypertension
-                            </div>
-                            
-                            <!-- Enhanced Risk Assessment -->
-                            <div class="risk-assessment-card mb-4">
-                                <div class="row align-items-center">
-                                    <div class="col-md-4 text-center mb-3 mb-md-0">
-                                        <div class="risk-percentage-circle {% if prediction.ensemble.prediction == 'Yes' %}risk-high{% else %}risk-low{% endif %}">
-                                            <div class="percentage-value">
-                                                {{ prediction.ensemble.probability }}%
+                        <div class="result-box mt-5">
+                            <!-- Main Prediction Result -->
+                            <div class="prediction-result-card mb-4">
+                                <div class="risk-level {% if prediction.ensemble.prediction == 'Yes' %}risk-high{% else %}risk-low{% endif %} mb-0 rounded-top">
+                                    <i class="fas {% if prediction.ensemble.prediction == 'Yes' %}fa-exclamation-triangle{% else %}fa-check-circle{% endif %} me-2"></i>
+                                    Predicted: {% if prediction.ensemble.prediction == 'Yes' %}With{% else %}Without{% endif %} Hypertension
+                                </div>
+                                
+                                <!-- Enhanced Risk Assessment -->
+                                <div class="risk-assessment-content p-4">
+                                    <div class="row align-items-center">
+                                        <!-- Probability Circle -->
+                                        <div class="col-md-4 text-center mb-4 mb-md-0">
+                                            <div class="risk-percentage-circle {% if prediction.ensemble.prediction == 'Yes' %}risk-high{% else %}risk-low{% endif %}">
+                                                <div class="percentage-value">
+                                                    {{ prediction.ensemble.probability }}%
+                                                </div>
+                                                <div class="percentage-label">Model Confidence</div>
                                             </div>
-                                            <div class="percentage-label">Risk Level</div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <h5 class="text-center text-md-start mb-3">
-                                            <i class="fas fa-layer-group me-2"></i>
-                                            Detailed Risk Assessment
-                                        </h5>
-                                        <div class="progress-container">
-                                            <div class="progress" style="height: 25px;">
-                                                <div class="progress-bar probability-bar {% if prediction.ensemble.prediction == 'Yes' %}bg-danger{% else %}bg-success{% endif %}"
-                                                     role="progressbar"
-                                                     style="width: {{ prediction.ensemble.probability }}%">
+                                        
+                                        <!-- Risk Assessment Details -->
+                                        <div class="col-md-8">
+                                            <h5 class="assessment-title mb-3">
+                                                <i class="fas fa-chart-line me-2"></i>
+                                                Risk Assessment Details
+                                            </h5>
+                                            
+                                            <!-- Risk Level Bar -->
+                                            <div class="progress-container mb-4">
+                                                <div class="progress" style="height: 25px;">
+                                                    <div class="progress-bar probability-bar {% if prediction.ensemble.prediction == 'Yes' %}bg-danger{% else %}bg-success{% endif %}"
+                                                         role="progressbar"
+                                                         style="width: {{ prediction.ensemble.probability }}%">
+                                                        <span class="progress-label">{{ prediction.ensemble.probability }}%</span>
+                                                    </div>
+                                                </div>
+                                                <div class="progress-scale mt-2 d-flex justify-content-between">
+                                                    <span class="scale-label text-success">Low Risk</span>
+                                                    <span class="scale-label text-warning">Moderate Risk</span>
+                                                    <span class="scale-label text-danger">High Risk</span>
+                                                </div>
+                                                <div class="progress-markers">
+                                                    <div class="marker" style="left: 33%"></div>
+                                                    <div class="marker" style="left: 66%"></div>
                                                 </div>
                                             </div>
-                                            <div class="progress-labels mt-2 d-flex justify-content-between">
-                                                <span class="text-success">Low Risk</span>
-                                                <span class="text-warning">Moderate Risk</span>
-                                                <span class="text-danger">High Risk</span>
-                                            </div>
-                                            <div class="progress-markers">
-                                                <div class="marker" style="left: 33%"></div>
-                                                <div class="marker" style="left: 66%"></div>
-                                            </div>
+                                            
+                                            <!-- Risk Status Alert -->
+                                            {% if prediction.ensemble.prediction == 'Yes' %}
+                                                <div class="alert alert-danger border-danger mb-0" role="alert">
+                                                    <h6 class="alert-heading mb-2"><i class="fas fa-exclamation-circle me-2"></i>High Risk Status</h6>
+                                                    <p class="mb-2">Your assessment indicates a high risk of hypertension. It's recommended to:</p>
+                                                    <ul class="mb-0">
+                                                        <li>Schedule a consultation with a healthcare provider</li>
+                                                        <li>Monitor your blood pressure regularly</li>
+                                                        <li>Review and adjust your lifestyle factors</li>
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                <div class="alert alert-success border-success mb-0" role="alert">
+                                                    <h6 class="alert-heading mb-2"><i class="fas fa-check-circle me-2"></i>Low Risk Status</h6>
+                                                    <p class="mb-2">Your assessment indicates a low risk of hypertension. To maintain this:</p>
+                                                    <ul class="mb-0">
+                                                        <li>Continue your healthy lifestyle habits</li>
+                                                        <li>Regular health check-ups are still recommended</li>
+                                                        <li>Monitor your blood pressure periodically</li>
+                                                    </ul>
+                                                </div>
+                                            {% endif %}
                                         </div>
-                                        {% if prediction.ensemble.prediction == 'Yes' %}
-                                            <div class="alert alert-danger" role="alert">
-                                                <p class="mb-0"><i class="fas fa-exclamation-circle me-1"></i>Your risk level is in the <strong class="text-danger">high risk zone</strong>. 
-                                                It's recommended to consult with a healthcare provider.</p>
-                                            </div>
-                                        {% else %}
-                                            <div class="alert alert-success" role="alert">
-                                                <p class="mb-0"><i class="fas fa-exclamation-circle me-1"></i>Your risk level is in the <strong class="text-success">low risk zone</strong>. 
-                                                Continue maintaining your healthy lifestyle.</p>
-                                            </div>
-                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
-                            
+
+                            <style>
+                                .prediction-result-card {
+                                    background: white;
+                                    border-radius: 15px;
+                                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                                    overflow: hidden;
+                                }
+                                
+                                .risk-assessment-content {
+                                    background: rgba(255, 255, 255, 0.9);
+                                }
+                                
+                                .assessment-title {
+                                    color: #2c3e50;
+                                    font-weight: 600;
+                                }
+                                
+                                .progress-label {
+                                    position: absolute;
+                                    right: 10px;
+                                    color: white;
+                                    font-weight: 600;
+                                }
+                                
+                                .scale-label {
+                                    font-size: 0.8rem;
+                                    font-weight: 600;
+                                }
+                                
+                                .alert {
+                                    border-left-width: 4px;
+                                }
+                                
+                                .alert ul {
+                                    padding-left: 1.2rem;
+                                }
+                                
+                                .alert li {
+                                    margin-bottom: 0.3rem;
+                                }
+                                
+                                .alert li:last-child {
+                                    margin-bottom: 0;
+                                }
+                            </style>
+
                             <!-- Visualizations -->
                             {% if visualizations %}
                             <div class="row mt-4">
@@ -435,21 +605,6 @@
                                 </div>
                             </div>
                             {% endif %}
-                            
-                            {% if prediction.ensemble.prediction == 'Yes' %}
-                            <div class="alert alert-info mt-4" role="alert">
-                                <h6 class="alert-heading">
-                                    <i class="fas fa-clipboard-list me-2"></i>
-                                    Recommendations:
-                                </h6>
-                                <ul class="mb-0">
-                                    <li>Schedule a check-up with your healthcare provider</li>
-                                    <li>Monitor your blood pressure regularly</li>
-                                    <li>Maintain a healthy lifestyle with proper diet and exercise</li>
-                                    <li>Reduce salt intake and manage stress levels</li>
-                                </ul>
-                            </div>
-                            {% endif %}
                         </div>
                         {% endif %}
                     </div>
@@ -458,24 +613,93 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <div class="loading-animation mb-4">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <h5>Predicting Data</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Form validation
-        (function () {
-            'use strict'
-            var forms = document.querySelectorAll('.needs-validation')
-            Array.prototype.slice.call(forms)
-                .forEach(function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault()
-                            event.stopPropagation()
+        // Form validation and submission
+        $(document).ready(function() {
+            const form = $('.needs-validation');
+            const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            const resultBox = $('.result-box');
+
+            form.on('submit', function(event) {
+                event.preventDefault();
+                
+                // Check form validity
+                if (!this.checkValidity()) {
+                    event.stopPropagation();
+                    $(this).addClass('was-validated');
+                    return;
+                }
+
+                // Show loading modal
+                loadingModal.show();
+
+                // Get form data
+                const formData = new FormData(this);
+
+                // Send AJAX request
+                $.ajax({
+                    url: '',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Hide loading modal
+                        loadingModal.hide();
+                        
+                        // First, remove any existing result box
+                        $('.result-box').remove();
+                        
+                        // Update the page content with the response
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(response, 'text/html');
+                        const newResultBox = $(doc).find('.result-box');
+                        
+                        if (newResultBox.length) {
+                            // Append the new result box after the form
+                            form.after(newResultBox);
+                            
+                            // Scroll to the new result box
+                            newResultBox[0].scrollIntoView({ behavior: 'smooth' });
                         }
-                        form.classList.add('was-validated')
-                    }, false)
-                })
-        })()
+                    },
+                    error: function(xhr, status, error) {
+                        // Hide loading modal
+                        loadingModal.hide();
+                        
+                        // Show error message
+                        alert('An error occurred while processing your request. Please try again.');
+                    }
+                });
+
+                $(this).addClass('was-validated');
+            });
+        });
     </script>
 </body>
 </html>
