@@ -318,9 +318,9 @@
                                 <!-- Age -->
                                 <div class="col-md-6">
                                     <label class="form-label"><i class="fas fa-birthday-cake me-2"></i>Age</label>
-                                    <input type="number" name="age" class="form-control" min="18" max="100" required 
-                                           placeholder="Enter age (18-100)"
-                                           title="Please enter your age between 18 and 100 years"
+                                    <input type="number" name="age" class="form-control" min="18" max="90" required 
+                                           placeholder="Enter age (18-90)"
+                                           title="Please enter your age between 18 and 90 years"
                                            value="{{ form_data.age|default:'' }}">
                                 </div>
 
@@ -358,52 +358,57 @@
                                     </select>
                                 </div>
 
-                                <!-- Physical Activity -->
-                                <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-running me-2"></i>Physical Activity</label>
-                                    <select name="physical_activity" class="form-select" required>
-                                        <option value="">Choose...</option>
-                                        <option value="Often" {% if form_data.physical_activity == "Often" %}selected{% endif %}>Often</option>
-                                        <option value="Sometimes" {% if form_data.physical_activity == "Sometimes" %}selected{% endif %}>Sometimes</option>
-                                        <option value="Rarely" {% if form_data.physical_activity == "Rarely" %}selected{% endif %}>Rarely</option>
-                                        <option value="Never" {% if form_data.physical_activity == "Never" %}selected{% endif %}>Never</option>
-                                    </select>
-                                </div>
-
                                 <!-- Cholesterol -->
                                 <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-droplet me-2"></i>Cholesterol (mmol/L)</label>
-                                    <input type="number" name="cholesterol" class="form-control" min="2.0" max="8.0" step="0.1" required 
-                                           placeholder="Enter cholesterol (2.0-8.0)"
-                                           title="Please enter your cholesterol level between 2.0 and 8.0 mmol/L"
+                                    <label class="form-label">
+                                        <i class="fas fa-droplet me-2"></i>Cholesterol (mmol/L)
+                                        <small class="text-muted">(Optional)</small>
+                                    </label>
+                                    <input type="number" name="cholesterol" class="form-control" min="0.0" max="13.0" step="0.1"
+                                           placeholder="Enter cholesterol (0.0-13.0)"
+                                           title="Please enter your cholesterol level between 0.0 and 13.0 mmol/L"
                                            value="{{ form_data.cholesterol|default:'' }}">
+                                    <div class="form-text text-muted">If left blank, average value (1.58 mmol/L) will be used</div>
                                 </div>
 
                                 <!-- Heart Rate -->
                                 <div class="col-md-6">
                                     <label class="form-label"><i class="fas fa-heartbeat me-2"></i>Heart Rate (bpm)</label>
-                                    <input type="number" name="heart_rate" class="form-control" min="40" max="140" required 
-                                           placeholder="Enter heart rate (40-140)"
-                                           title="Please enter your heart rate between 40 and 140 beats per minute"
+                                    <input type="number" name="heart_rate" class="form-control" min="55" max="130" required 
+                                           placeholder="Enter heart rate (55-130)"
+                                           title="Please enter your heart rate between 55 and 130 beats per minute"
                                            value="{{ form_data.heart_rate|default:'' }}">
                                 </div>
 
                                 <!-- Diabetes -->
                                 <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-syringe me-2"></i>Diabetes (mmol/L)</label>
-                                    <input type="number" name="diabetes" class="form-control" min="3.0" max="15.0" step="0.1" required 
-                                           placeholder="Enter glucose level (3.0-15.0)"
-                                           title="Please enter your blood glucose level between 3.0 and 15.0 mmol/L"
+                                    <label class="form-label">
+                                        <i class="fas fa-syringe me-2"></i>Diabetes (mmol/L)
+                                        <small class="text-muted">(Optional)</small>
+                                    </label>
+                                    <input type="number" name="diabetes" class="form-control" min="0.0" max="27.0" step="0.1"
+                                           placeholder="Enter glucose level (0.0-27.0)"
+                                           title="Please enter your blood glucose level between 0.0 and 27.0 mmol/L"
                                            value="{{ form_data.diabetes|default:'' }}">
+                                    <div class="form-text text-muted">If left blank, average value (0.85 mmol/L) will be used</div>
                                 </div>
 
-                                <!-- Blood Pressure -->
+                                <!-- Systolic BP -->
                                 <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-heart me-2"></i>Blood Pressure (mmHg)</label>
-                                    <input type="text" name="bp" class="form-control" pattern="\d{2,3}\/\d{2,3}" 
-                                           placeholder="120/80" required 
-                                           value="{{ form_data.bp|default:'' }}"
-                                           title="Please enter blood pressure in format: 120/80">
+                                    <label class="form-label"><i class="fas fa-heart me-2"></i>Systolic BP (mmHg)</label>
+                                    <input type="number" name="systolic_bp" class="form-control" min="70" max="200" required 
+                                           placeholder="Enter systolic BP (70-200)"
+                                           title="Please enter your systolic blood pressure between 70 and 200 mmHg"
+                                           value="{{ form_data.systolic_bp|default:'' }}">
+                                </div>
+
+                                <!-- Diastolic BP -->
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-heart me-2"></i>Diastolic BP (mmHg)</label>
+                                    <input type="number" name="diastolic_bp" class="form-control" min="55" max="130" required 
+                                           placeholder="Enter diastolic BP (55-130)"
+                                           title="Please enter your diastolic blood pressure between 55 and 130 mmHg"
+                                           value="{{ form_data.diastolic_bp|default:'' }}">
                                 </div>
                             </div>
                             
