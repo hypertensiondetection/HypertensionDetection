@@ -116,9 +116,13 @@ def generate_visualizations(prediction_data, input_data):
     bp_normalized = (systolic_bp - NUMERICAL_RANGES['Systolic_BP'][0]) / (NUMERICAL_RANGES['Systolic_BP'][1] - NUMERICAL_RANGES['Systolic_BP'][0])
     hr_normalized = (float(input_data['heart_rate']) - NUMERICAL_RANGES['Heart_Rate'][0]) / (NUMERICAL_RANGES['Heart_Rate'][1] - NUMERICAL_RANGES['Heart_Rate'][0])
     
-    # Handle optional fields for visualization
-    cholesterol = input_data.get('cholesterol', '').strip()
-    chol_value = float(cholesterol) if cholesterol else MEAN_VALUES['Cholesterol']
+    # Handle optional fields with mean values
+    cholesterol = input_data.get('cholesterol', '')
+    diabetes = input_data.get('diabetes', '')
+    
+    chol_value = float(cholesterol) if cholesterol.strip() else MEAN_VALUES['Cholesterol']
+    diabetes_value = float(diabetes) if diabetes.strip() else MEAN_VALUES['Diabetes']
+    
     chol_normalized = (chol_value - NUMERICAL_RANGES['Cholesterol'][0]) / (NUMERICAL_RANGES['Cholesterol'][1] - NUMERICAL_RANGES['Cholesterol'][0])
     
     # Calculate risk factor score
@@ -181,7 +185,7 @@ def generate_visualizations(prediction_data, input_data):
     lifestyle_values = [
         1 if input_data['smoking_habits'].lower() == 'often' else 0,
         1 if input_data['alcohol_consumption'].lower() == 'often' else 0,
-        1 if float(input_data['diabetes']) > NUMERICAL_RANGES['Diabetes'][0] else 0
+        1 if diabetes_value > NUMERICAL_RANGES['Diabetes'][0] else 0  # Use diabetes_value instead of input_data['diabetes']
     ]
     colors = ['#e74c3c' if val == 1 else '#2ecc71' for val in lifestyle_values]
     
