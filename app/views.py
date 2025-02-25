@@ -50,8 +50,8 @@ NUMERICAL_RANGES = {
 
 # Add these constants after NUMERICAL_RANGES
 MEAN_VALUES = {
-    'Cholesterol': 1.58,  # Mean value from the training dataset
-    'Diabetes': 0.85      # Mean value from the training dataset
+    'Cholesterol': 4.69,  # Mean value from the training dataset (excluding zeros)
+    'Diabetes': 10.62      # Mean value from the training dataset (excluding zeros)
 }
 
 def preprocess_input(data):
