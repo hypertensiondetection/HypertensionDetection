@@ -25,18 +25,14 @@ except Exception as e:
     print(f"Error loading models: {str(e)}")
     raise
 
-# Global constants from hypertensiondetection.py
+# Global constants from hypertensiondetection.py - Updated to match the new feature order
 FEATURE_ORDER = [
-    'Gender', 'Age', 'Genetic_History', 'Smoking_Habits',
-    'Alcohol_Consumption', 'Cholesterol', 'Heart_Rate',
-    'Diabetes', 'Systolic_BP', 'Diastolic_BP'
+    'Gender', 'Age', 'Systolic_BP', 'Diastolic_BP',
+    'Cholesterol', 'Heart_Rate', 'Diabetes'
 ]
 
 CATEGORICAL_MAPPINGS = {
     'Gender': {'male': 1, 'female': 0},
-    'Genetic_History': {'yes': 1, 'no': 0},
-    'Smoking_Habits': {'often': 3, 'sometimes': 2, 'rarely': 1, 'never': 0, 'always': 3},
-    'Alcohol_Consumption': {'often': 3, 'sometimes': 2, 'rarely': 1, 'never': 0}
 }
 
 NUMERICAL_RANGES = {
@@ -48,10 +44,9 @@ NUMERICAL_RANGES = {
     'Diastolic_BP': (55, 130)
 }
 
-# Add these constants after NUMERICAL_RANGES
 MEAN_VALUES = {
-    'Cholesterol': 4.69,  # Mean value from the training dataset (excluding zeros)
-    'Diabetes': 10.62      # Mean value from the training dataset (excluding zeros)
+    'Cholesterol': 4.53,  # Mean value from the actual dataset (4.52756)
+    'Diabetes': 7.14      # Mean value from the actual dataset (7.14244)
 }
 
 def preprocess_input(data):
@@ -61,9 +56,6 @@ def preprocess_input(data):
     
     # Handle categorical features
     processed_data['Gender'] = CATEGORICAL_MAPPINGS['Gender'][data['gender'].lower()]
-    processed_data['Genetic_History'] = CATEGORICAL_MAPPINGS['Genetic_History'][data['genetic_history'].lower()]
-    processed_data['Smoking_Habits'] = CATEGORICAL_MAPPINGS['Smoking_Habits'][data['smoking_habits'].lower()]
-    processed_data['Alcohol_Consumption'] = CATEGORICAL_MAPPINGS['Alcohol_Consumption'][data['alcohol_consumption'].lower()]
     
     # Handle numerical features
     processed_data['Age'] = float(data['age'])
@@ -71,12 +63,38 @@ def preprocess_input(data):
     processed_data['Systolic_BP'] = float(data['systolic_bp'])
     processed_data['Diastolic_BP'] = float(data['diastolic_bp'])
     
-    # Handle optional fields with mean values
+    # Handle optional fields with population-specific mean values
     cholesterol = data.get('cholesterol', '').strip()
     diabetes = data.get('diabetes', '').strip()
     
-    processed_data['Cholesterol'] = float(cholesterol) if cholesterol else MEAN_VALUES['Cholesterol']
-    processed_data['Diabetes'] = float(diabetes) if diabetes else MEAN_VALUES['Diabetes']
+    # Determine if user is likely hypertensive based on blood pressure
+    is_likely_hypertensive = (processed_data['Systolic_BP'] >= 140 or 
+                             processed_data['Diastolic_BP'] >= 90)
+    
+    # Use appropriate mean values based on likely hypertension status
+    if not cholesterol:
+        if is_likely_hypertensive:
+            processed_data['Cholesterol'] = 4.55  # Mean for hypertensive patients
+        else:
+            processed_data['Cholesterol'] = 4.51  # Mean for non-hypertensive patients
+    else:
+        try:
+            processed_data['Cholesterol'] = float(cholesterol)
+        except ValueError:
+            # If conversion fails, use appropriate mean
+            processed_data['Cholesterol'] = 4.55 if is_likely_hypertensive else 4.51
+    
+    if not diabetes:
+        if is_likely_hypertensive:
+            processed_data['Diabetes'] = 8.78  # Mean for hypertensive patients
+        else:
+            processed_data['Diabetes'] = 5.52  # Mean for non-hypertensive patients
+    else:
+        try:
+            processed_data['Diabetes'] = float(diabetes)
+        except ValueError:
+            # If conversion fails, use appropriate mean
+            processed_data['Diabetes'] = 8.78 if is_likely_hypertensive else 5.52
     
     # Create input data in correct order
     input_data = [[processed_data[feature] for feature in FEATURE_ORDER]]
@@ -108,7 +126,7 @@ def generate_visualizations(prediction_data, input_data):
     visualizations = {}
     
     # 1. Risk Factors Radar Chart
-    categories = ['Age', 'Blood Pressure', 'Heart Rate', 'Cholesterol', 'Risk Factors']
+    categories = ['Age', 'Blood Pressure', 'Heart Rate', 'Cholesterol']
     
     # Normalize values based on NUMERICAL_RANGES
     age_normalized = (float(input_data['age']) - NUMERICAL_RANGES['Age'][0]) / (NUMERICAL_RANGES['Age'][1] - NUMERICAL_RANGES['Age'][0])
@@ -125,14 +143,7 @@ def generate_visualizations(prediction_data, input_data):
     
     chol_normalized = (chol_value - NUMERICAL_RANGES['Cholesterol'][0]) / (NUMERICAL_RANGES['Cholesterol'][1] - NUMERICAL_RANGES['Cholesterol'][0])
     
-    # Calculate risk factor score
-    risk_factors = (
-        (float(input_data['smoking_habits'].lower() == 'often') * 0.4) +
-        (float(input_data['genetic_history'].lower() == 'yes') * 0.3) +
-        (float(input_data['alcohol_consumption'].lower() == 'often') * 0.3)
-    )
-    
-    values = [age_normalized, bp_normalized, hr_normalized, chol_normalized, risk_factors]
+    values = [age_normalized, bp_normalized, hr_normalized, chol_normalized]
     values = np.clip(values, 0, 1)  # Ensure values are between 0 and 1
     
     # Create radar chart
@@ -158,9 +169,10 @@ def generate_visualizations(prediction_data, input_data):
     
     # 2. Health Metrics Bar Chart
     plt.figure(figsize=(10, 6))
-    metrics = ['Blood Pressure', 'Heart Rate', 'Cholesterol']
-    values = [bp_normalized, hr_normalized, chol_normalized]
-    colors = ['#3498db', '#2ecc71', '#e74c3c']
+    metrics = ['Blood Pressure', 'Heart Rate', 'Cholesterol', 'Diabetes']
+    diabetes_normalized = (diabetes_value - NUMERICAL_RANGES['Diabetes'][0]) / (NUMERICAL_RANGES['Diabetes'][1] - NUMERICAL_RANGES['Diabetes'][0])
+    values = [bp_normalized, hr_normalized, chol_normalized, diabetes_normalized]
+    colors = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6']
     
     bars = plt.bar(metrics, values, color=colors)
     plt.title('Health Metrics Analysis', pad=20)
@@ -179,31 +191,51 @@ def generate_visualizations(prediction_data, input_data):
     visualizations['health_metrics'] = base64.b64encode(buffer.getvalue()).decode()
     plt.close()
     
-    # 3. Lifestyle Risk Factors
+    # 3. Blood Pressure Analysis
     plt.figure(figsize=(10, 6))
-    lifestyle_factors = ['Smoking', 'Alcohol', 'Diabetes']
-    lifestyle_values = [
-        1 if input_data['smoking_habits'].lower() == 'often' else 0,
-        1 if input_data['alcohol_consumption'].lower() == 'often' else 0,
-        1 if diabetes_value > NUMERICAL_RANGES['Diabetes'][0] else 0  # Use diabetes_value instead of input_data['diabetes']
-    ]
-    colors = ['#e74c3c' if val == 1 else '#2ecc71' for val in lifestyle_values]
+    bp_categories = ['Normal', 'Elevated', 'Stage 1', 'Stage 2', 'Crisis']
+    bp_thresholds = [120, 130, 140, 180, 200]  # Systolic BP thresholds
     
-    bars = plt.bar(lifestyle_factors, lifestyle_values, color=colors)
-    plt.title('Lifestyle Risk Factors', pad=20)
-    plt.ylabel('Present (1) / Absent (0)')
-    plt.ylim(0, 1.2)
+    # Determine BP category
+    systolic = float(input_data['systolic_bp'])
+    diastolic = float(input_data['diastolic_bp'])
     
-    for bar in bars:
-        height = bar.get_height()
-        status = "Present" if height == 1 else "Absent"
-        plt.text(bar.get_x() + bar.get_width()/2., height + 0.05,
-                status, ha='center', va='bottom')
+    if systolic < 120 and diastolic < 80:
+        bp_category = 0  # Normal
+    elif (systolic >= 120 and systolic < 130) and diastolic < 80:
+        bp_category = 1  # Elevated
+    elif (systolic >= 130 and systolic < 140) or (diastolic >= 80 and diastolic < 90):
+        bp_category = 2  # Stage 1
+    elif (systolic >= 140 and systolic < 180) or (diastolic >= 90 and diastolic < 120):
+        bp_category = 3  # Stage 2
+    else:
+        bp_category = 4  # Crisis
+    
+    # Create bar colors (highlight current category)
+    colors = ['#2ecc71', '#f1c40f', '#e67e22', '#e74c3c', '#c0392b']
+    alpha_values = [0.3, 0.3, 0.3, 0.3, 0.3]
+    alpha_values[bp_category] = 1.0
+    
+    # Create bars with alpha values - Fix: Apply alpha individually to each bar
+    bars = plt.bar(bp_categories, [0.2, 0.4, 0.6, 0.8, 1.0], color=colors)
+    
+    # Set alpha for each bar individually
+    for i, bar in enumerate(bars):
+        bar.set_alpha(alpha_values[i])
+    
+    # Add systolic/diastolic values
+    plt.axhline(y=systolic/200, color='red', linestyle='--', label=f'Systolic: {systolic} mmHg')
+    plt.axhline(y=diastolic/130, color='blue', linestyle='--', label=f'Diastolic: {diastolic} mmHg')
+    
+    plt.title('Blood Pressure Classification', pad=20)
+    plt.ylabel('Severity')
+    plt.ylim(0, 1.1)
+    plt.legend()
     
     buffer = BytesIO()
     plt.savefig(buffer, format='png', bbox_inches='tight', dpi=300)
     buffer.seek(0)
-    visualizations['lifestyle_factors'] = base64.b64encode(buffer.getvalue()).decode()
+    visualizations['bp_analysis'] = base64.b64encode(buffer.getvalue()).decode()
     plt.close()
     
     # 4. Age-Related Risk Analysis
@@ -213,9 +245,11 @@ def generate_visualizations(prediction_data, input_data):
     age_risks = [0.3, 0.6, 0.9]
     colors = ['#2ecc71', '#f1c40f', '#e74c3c']
     
+    # Create bars with default alpha
     bars = plt.bar(age_categories, age_risks, color=colors, alpha=0.3)
     current_age_category = 0 if age <= 35 else 1 if age <= 55 else 2
     
+    # Set alpha for the current category bar
     bars[current_age_category].set_alpha(1.0)
     
     plt.title('Age-Related Risk Analysis', pad=20)
@@ -258,10 +292,14 @@ def index(request):
             for field in optional_fields:
                 value = form_data.get(field.lower(), '')
                 if value and value.strip():  # Only validate if a value is provided
-                    min_val, max_val = NUMERICAL_RANGES[field]
-                    value = float(value)
-                    if not min_val <= value <= max_val:
-                        raise ValueError(f"{field} must be between {min_val} and {max_val}")
+                    try:
+                        min_val, max_val = NUMERICAL_RANGES[field]
+                        value = float(value)
+                        if not min_val <= value <= max_val:
+                            raise ValueError(f"{field} must be between {min_val} and {max_val}")
+                    except ValueError:
+                        # If conversion fails, raise a more helpful error
+                        raise ValueError(f"Invalid {field} value. Please enter a valid number.")
             
             # Process data and make prediction
             model_input = preprocess_input(form_data)

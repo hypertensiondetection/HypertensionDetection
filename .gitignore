@@ -13,6 +13,9 @@ Thumbs.db
 # Ignore virtual environment
 env/
 
+# Ignore dummy folder
+dummy/
+
 medical_data_v2.csv
 hypertension_prediction.py
 instructions.md
