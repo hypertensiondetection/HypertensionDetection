@@ -390,7 +390,7 @@
                             <div class="prediction-result-card mb-4">
                                 <div class="risk-level {% if prediction.ensemble.prediction == 'Yes' %}risk-high{% else %}risk-low{% endif %} mb-0 rounded-top">
                                     <i class="fas {% if prediction.ensemble.prediction == 'Yes' %}fa-exclamation-triangle{% else %}fa-check-circle{% endif %} me-2"></i>
-                                    Predicted: {% if prediction.ensemble.prediction == 'Yes' %}With{% else %}Without{% endif %} Hypertension
+                                    Prediction: {% if prediction.ensemble.prediction == 'Yes' %}With{% else %}Without{% endif %} Hypertension
                                 </div>
                                 
                                 <!-- Enhanced Risk Assessment -->
