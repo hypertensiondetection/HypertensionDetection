@@ -316,7 +316,7 @@ def index(request):
                 
             # Create a record for the prediction history
             prediction_record = {
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'timestamp': datetime.now().strftime('%Y-%m-%d %I:%M %p'),
                 'form_data': form_data,
                 'prediction': prediction['ensemble'],
                 # Don't store visualizations to keep session data compact
