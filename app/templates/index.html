@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hypertension Detection</title>
+    <title>Hypertension Assessment</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -16,12 +16,13 @@
             --success-color: #2ecc71;
             --danger-color: #e74c3c;
             --warning-color: #f1c40f;
+            --dark-color: #2c3e50;
         }
         
         body {
             background-color: var(--secondary-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-top: 2rem;
+            padding-top: 5rem;
             padding-bottom: 2rem;
         }
         
@@ -35,7 +36,7 @@
         
         .card-header {
             background: linear-gradient(135deg, var(--primary-color), #2980b9);
-            padding: 1.5rem;
+            padding: 2.5rem;
             border-bottom: none;
         }
         
@@ -181,11 +182,6 @@
             overflow: visible;
         }
         
-        .probability-bar {
-            transition: width 1s ease-in-out;
-            position: relative;
-        }
-        
         .progress-labels {
             font-size: 0.85rem;
             font-weight: 600;
@@ -206,6 +202,53 @@
             top: 0;
         }
         
+        /* Modern minimalist navbar */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.07);
+            padding: 0.75rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--dark-color) !important;
+            font-size: 1.4rem;
+            padding: 0;
+        }
+        
+        .navbar-brand .logo-icon {
+            color: var(--primary-color);
+        }
+        
+        .navbar .nav-item {
+            margin: 0 0.25rem;
+        }
+        
+        .navbar .nav-link {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--dark-color) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            background-color: rgba(74, 144, 226, 0.08);
+            color: var(--primary-color) !important;
+        }
+        
+        .navbar .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
         /* Loading Animation Styles */
         .loading-animation {
             width: 80px;
@@ -290,16 +333,45 @@
     </style>
 </head>
 <body>
+    <!-- Minimalist Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="logo-icon me-2"><i class="fas fa-heartbeat"></i></span>
+                <span>Hypertension Monitor</span>
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-chart-line me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/assessment">
+                            <i class="fas fa-stethoscope me-1"></i> Assessment
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="prediction-card">
-                    <div class="card-header text-white text-center">
-                        <h2 class="mb-0">
-                            <i class="fas fa-heartbeat me-2"></i>
-                            Hypertension Risk Assessment
-                        </h2>
-                        <p class="mb-0 mt-2">Enter your health information for a comprehensive risk analysis</p>
+                    <div class="card-header text-white">
+                        <div class="text-center">
+                            <h2 class="mb-1">
+                                <i class="fas fa-heartbeat me-2"></i>
+                                Hypertension Risk Assessment
+                            </h2>
+                            <p class="mb-0 mt-2">Enter your health information for a comprehensive risk analysis</p>
+                        </div>
                     </div>
                     <div class="card-body p-4">
                         <form method="post" class="needs-validation" novalidate>
@@ -610,9 +682,9 @@
     <script>
         // Form validation and submission
         $(document).ready(function() {
-            const form = $('.needs-validation');
-            const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-            const resultBox = $('.result-box');
+            var form = $('.needs-validation');
+            var loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            var resultBox = $('.result-box');
 
             form.on('submit', function(event) {
                 event.preventDefault();
@@ -628,7 +700,7 @@
                 loadingModal.show();
 
                 // Get form data
-                const formData = new FormData(this);
+                var formData = new FormData(this);
 
                 // Send AJAX request
                 $.ajax({
@@ -645,9 +717,9 @@
                         $('.result-box').remove();
                         
                         // Update the page content with the response
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(response, 'text/html');
-                        const newResultBox = $(doc).find('.result-box');
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(response, 'text/html');
+                        var newResultBox = $(doc).find('.result-box');
                         
                         if (newResultBox.length) {
                             // Append the new result box after the form

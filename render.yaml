@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: hypertension-monitor
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn main.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.9.0
+    disk:
+      name: sessions
+      mountPath: /opt/render/project/src/session_files
+      sizeGB: 1 

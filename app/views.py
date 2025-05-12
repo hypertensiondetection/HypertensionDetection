@@ -11,6 +11,8 @@ import base64
 from io import BytesIO
 import numpy as np
 from django.http import JsonResponse
+import json
+from datetime import datetime
 
 # Suppress scikit-learn version warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -308,6 +310,30 @@ def index(request):
             # Generate visualizations
             visualizations = generate_visualizations(prediction, form_data)
             
+            # Store prediction data in session
+            if 'prediction_history' not in request.session:
+                request.session['prediction_history'] = []
+                
+            # Create a record for the prediction history
+            prediction_record = {
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'form_data': form_data,
+                'prediction': prediction['ensemble'],
+                # Don't store visualizations to keep session data compact
+            }
+            
+            # Add the new prediction to the history
+            prediction_history = request.session['prediction_history']
+            prediction_history.append(prediction_record)
+            
+            # Keep only the last 10 predictions to avoid session bloat
+            if len(prediction_history) > 10:
+                prediction_history = prediction_history[-10:]
+                
+            # Update the session
+            request.session['prediction_history'] = prediction_history
+            request.session.modified = True
+            
             # If it's an AJAX request, return only the result section
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return render(request, 'index.html', {
@@ -331,4 +357,61 @@ def index(request):
         'visualizations': visualizations,
         'form_data': form_data
     })
+
+def dashboard(request):
+    # Get prediction history from session
+    prediction_history = request.session.get('prediction_history', [])
+    
+    # Calculate statistics from the prediction history
+    statistics = {}
+    if prediction_history:
+        # Count total predictions
+        statistics['total_predictions'] = len(prediction_history)
+        
+        # Count positive cases (hypertension = Yes)
+        positive_cases = sum(1 for record in prediction_history if record['prediction']['prediction'] == 'Yes')
+        statistics['positive_cases'] = positive_cases
+        statistics['negative_cases'] = statistics['total_predictions'] - positive_cases
+        
+        # Calculate average risk probability
+        statistics['avg_probability'] = sum(float(record['prediction']['probability']) 
+                                           for record in prediction_history) / statistics['total_predictions']
+        
+        # Calculate average systolic BP
+        statistics['avg_systolic'] = sum(float(record['form_data']['systolic_bp']) 
+                                        for record in prediction_history) / statistics['total_predictions']
+        
+        # Calculate average diastolic BP
+        statistics['avg_diastolic'] = sum(float(record['form_data']['diastolic_bp']) 
+                                         for record in prediction_history) / statistics['total_predictions']
+        
+        # Get highest and lowest risk predictions
+        sorted_by_risk = sorted(prediction_history, key=lambda x: float(x['prediction']['probability']))
+        statistics['lowest_risk'] = sorted_by_risk[0] if sorted_by_risk else None
+        statistics['highest_risk'] = sorted_by_risk[-1] if sorted_by_risk else None
+        
+        # Track trends - is risk increasing or decreasing?
+        if len(prediction_history) >= 2:
+            first_half = prediction_history[:len(prediction_history)//2]
+            second_half = prediction_history[len(prediction_history)//2:]
+            
+            avg_first_half = sum(float(record['prediction']['probability']) 
+                                for record in first_half) / len(first_half)
+            avg_second_half = sum(float(record['prediction']['probability']) 
+                                 for record in second_half) / len(second_half)
+            
+            statistics['trend'] = 'increasing' if avg_second_half > avg_first_half else 'decreasing'
+        else:
+            statistics['trend'] = 'stable'
+    
+    # Serialize prediction history for JavaScript
+    prediction_history_json = json.dumps(prediction_history)
+    
+    context = {
+        'prediction_history': prediction_history,
+        'prediction_history_json': prediction_history_json,
+        'statistics': statistics
+    }
+    
+    return render(request, 'dashboard.html', context)
 

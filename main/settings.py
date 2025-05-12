@@ -77,12 +77,26 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Session Settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+
+# Check if we're running on Render
+if os.environ.get('RENDER'):
+    # Production settings (Render)
+    SESSION_FILE_PATH = '/opt/render/project/src/session_files'
+else:
+    # Development settings (local)
+    SESSION_FILE_PATH = os.path.join(BASE_DIR, 'session_files')
+
+# 30 days in seconds (60 seconds * 60 minutes * 24 hours * 30 days)
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 
 
 # Password validation
